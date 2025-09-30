@@ -1,0 +1,7 @@
+application-dev.yml
+.env
+/data/index/
+/target/
+.idea
+ollama_data
+docker-compose-dev.yml

@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+app:
+  indexDir: data/index
+  confluence:
+    baseUrl: ${CONFLUENCE_BASE_URL:}
+    username: ${CONFLUENCE_USERNAME:}
+    apiToken: ${CONFLUENCE_API_TOKEN:}
+    space:
+      keys:
+        - Fcom
+        - DE
+        - BE
+        - IR
+        - TF
+        - TF1
+        - HR
+        - DBA
+        - DT
+        - BT
+  openai:
+    apiKey: ${OPENAI_API_KEY:}
+    embeddingsModel: text-embedding-3-small
+  ollama:
+    baseUrl: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: bge-m3:567m
+  security:
+    allowed:
+      emails: ${ALLOWED_EMAILS:}
+      domains: ${ALLOWED_DOMAINS:}
+  oauth-uri: ${OAUTH_URI:}
+  resource-uri: ${RESOURCE_URL:}
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH_URI:}

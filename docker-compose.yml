@@ -1,0 +1,52 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command:
+      - start-dev                    # 先用 dev；上線請改用正式 DB / TLS
+      - --http-enabled=true
+      - --http-port=8090
+      # 建議加上外部可存取的 FQDN（供 token 的 iss/redirect 使用）
+      - --hostname=http://localhost:8090
+      - --proxy-headers=xforwarded
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_FEATURES: client-policies,client-secret-rotation,token-exchange
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_ORIGINS=*
+    restart: unless-stopped
+    # 如果您有 GPU，可以取消下面的註解
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # 初始化容器，用於拉取模型
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    volumes:
+      - ./ollama_data:/root/.ollama
+    entrypoint: >
+      sh -c "
+        echo 'Waiting for Ollama to be ready...' &&
+        sleep 10 &&
+        ollama pull bge-m3:567m &&
+        echo 'Model bge-m3:567m pulled successfully!'
+      "
+    restart: "no"
